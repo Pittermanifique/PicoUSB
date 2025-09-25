@@ -29,18 +29,23 @@ m.label = "PicoUSB"
 storage.remount("/", readonly=True)
 storage.enable_usb_drive()
 
-time.sleep(0.1) #wait a bit so the button gets pulled up
+flag = microcontroller.nvm[0]
 
-if mode.value:
-    storage.disable_usb_drive()
+time.sleep(0.1) #wait a bit so the button gets pulled up
+if flag:
+    storage.enable_usb_drive()
+    microcontroller.nvm[0] = 0
 else:
-    time.sleep(0.1) #check again after 100ms to see if the button is still pressed
     if mode.value:
         storage.disable_usb_drive()
     else:
-        storage.enable_usb_drive()
-        microcontroller.on_next_reset(microcontroller.RunMode.SAFE_MODE)
-        microcontroller.reset()
+        time.sleep(0.1) #check again after 100ms to see if the button is still pressed
+        if mode.value:
+            storage.disable_usb_drive()
+        else:
+            storage.enable_usb_drive()
+            microcontroller.on_next_reset(microcontroller.RunMode.SAFE_MODE)
+            microcontroller.reset()
     
 
 # in case you screw up and disable usb drive without the ability to enable it, to enter safe mode write in shell:

