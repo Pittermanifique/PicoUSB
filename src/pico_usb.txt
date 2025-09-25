@@ -22,16 +22,4 @@
 ######################################################################################
 
 delay(1)
-press(windows + d) # minimizes all windows
-delay(1)
-press(windows + r) # Run window
-delay(2)
-write(notepad)
-press(enter)
-delay(2)
-write(Hello from PicoUSB!)
-delay(1)
-loop()
-write(!)
-move(5, 5)
-delay(0.5)
+payload(test.bat)
