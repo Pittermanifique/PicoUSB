@@ -1,1 +1,2 @@
-msg * "Payload run !"
+echo HelloWorld
+pause

